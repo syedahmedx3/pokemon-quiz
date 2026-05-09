@@ -2,24 +2,25 @@ export default function StatBar({ label, value, color }) {
   const pct = Math.min(100, Math.round((value / 255) * 100));
   return (
     <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-      <div
+      <span
+        className="t-caption"
         style={{
-          width: 60,
-          fontSize: 9.5,
-          color: "rgba(255,255,255,.38)",
-          fontWeight: 700,
-          letterSpacing: 0.5,
+          width: 52,
+          color: "var(--color-ink-48)",
+          fontWeight: 600,
           textTransform: "uppercase",
+          letterSpacing: "0.5px",
+          flexShrink: 0,
         }}
       >
         {label}
-      </div>
+      </span>
       <div
         style={{
           flex: 1,
-          height: 5,
-          borderRadius: 3,
-          background: "rgba(255,255,255,.08)",
+          height: 4,
+          borderRadius: "var(--r-pill)",
+          background: "var(--color-hairline)",
           overflow: "hidden",
         }}
       >
@@ -27,23 +28,23 @@ export default function StatBar({ label, value, color }) {
           style={{
             width: `${pct}%`,
             height: "100%",
-            borderRadius: 3,
             background: color,
-            transition: "width .6s ease",
+            borderRadius: "var(--r-pill)",
+            transition: "width .55s ease",
           }}
         />
       </div>
-      <div
+      <span
+        className="t-caption"
         style={{
           width: 28,
-          fontSize: 11,
-          fontWeight: 700,
-          color: "rgba(255,255,255,.55)",
-          textAlign: "right",
+          textAlign: "end",
+          color: "var(--color-ink-48)",
+          fontWeight: 600,
         }}
       >
         {value}
-      </div>
+      </span>
     </div>
   );
 }
