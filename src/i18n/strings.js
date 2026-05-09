@@ -1,0 +1,190 @@
+/**
+ * i18n string map.
+ * Add new languages by duplicating the `en` block and translating values.
+ * `dir` controls the HTML dir attribute — 'ltr' or 'rtl'.
+ */
+export const STRINGS = {
+  en: {
+    dir: "ltr",
+    lang: "en",
+    nav: {
+      title: "Pokémon Quiz",
+      langLabel: "عربي",
+    },
+    home: {
+      eyebrow: "Professor Oak's Academy",
+      headline: ["Pokémon", "Knowledge", "Test"],
+      tagline:
+        "How well do you really know your Pokémon? Prove it across 10 timed questions.",
+      bestScore: "Personal Best",
+      modeLabel: "Select Quiz Mode",
+      modes: {
+        silhouette: {
+          icon: "🌑",
+          title: "Who's That Pokémon?",
+          desc: "Identify the Pokémon from its silhouette — the classic challenge.",
+        },
+        type: {
+          icon: "⚡",
+          title: "Type Expert",
+          desc: "Name the primary type of each Pokémon shown.",
+        },
+        mixed: {
+          icon: "🎲",
+          title: "Mixed Challenge",
+          desc: "Both modes combined — the ultimate knowledge test.",
+        },
+      },
+      diffLabel: "Difficulty",
+      diffs: {
+        easy: { label: "Rookie", sub: "Gen I", timer: "20s / Q" },
+        medium: { label: "Trainer", sub: "Gen I–III", timer: "15s / Q" },
+        hard: { label: "Champion", sub: "All Gens", timer: "10s / Q" },
+      },
+      features: ["10 Qs", "Streaks", "Time Bonus", "S–D Grade"],
+      cta: "Start the Test",
+      ctaArrow: "→",
+      poweredBy: "10 Questions · Powered by PokéAPI.co",
+    },
+    quiz: {
+      scoreLabel: "Score",
+      modeSilhouette: "Who's That Pokémon?",
+      modeType: "What Type Is This?",
+      timeLabel: "s",
+      correct: "Correct!",
+      wrong: "Wrong!",
+      timeout: "Time's up!",
+      streakMsg: (n) => `${n} in a row — don't break it!`,
+      answerLabel: "Answer",
+      showStats: "Show base stats ▼",
+      hideStats: "Hide stats ▲",
+      loadingLabel: (q, t) => `Loading question ${q} of ${t}…`,
+      statLabels: { hp: "HP", atk: "ATK", def: "DEF", spd: "SPD" },
+    },
+    results: {
+      grades: {
+        S: { title: "Pokémon Master!", sub: "A legendary achievement!" },
+        A: { title: "Gym Leader!", sub: "Outstanding knowledge!" },
+        B: { title: "Senior Trainer", sub: "Great performance!" },
+        C: { title: "Pokémon Trainer", sub: "Keep practicing!" },
+        D: { title: "Team Rocket Grunt", sub: "Back to the basics!" },
+      },
+      correct: (n, t) => `${n}/${t} correct`,
+      accuracy: (p) => `${p}% accuracy`,
+      stats: {
+        score: "Final Score",
+        accuracy: "Accuracy",
+        streak: "Best Streak",
+        avgTime: "Avg Answer",
+      },
+      diffLabels: {
+        easy: "Rookie · Gen I",
+        medium: "Trainer · Gen I–III",
+        hard: "Champion · All Gens",
+      },
+      diffIcons: { easy: "🟢", medium: "🟡", hard: "🔴" },
+      recapTitle: "Question Recap",
+      timeout: "timeout",
+      tip: "💡 Tip: Study type matchups and Gen I Pokémon first — they appear most often!",
+      sRankMsg: "🏅 S-Rank! You are a true Pokémon Master!",
+      playAgain: "Play Again",
+      playAgainArrow: "→",
+      changeSettings: "← Change Settings",
+      poweredBy: "Powered by PokéAPI.co",
+    },
+  },
+
+  ar: {
+    dir: "rtl",
+    lang: "ar",
+    nav: {
+      title: "اختبار بوكيمون",
+      langLabel: "English",
+    },
+    home: {
+      eyebrow: "أكاديمية البروفيسور أوك",
+      headline: ["اختبار", "معرفة", "بوكيمون"],
+      tagline:
+        "ما مدى معرفتك الحقيقية ببوكيمون؟ أثبت ذلك في ١٠ أسئلة محددة بوقت.",
+      bestScore: "أفضل نتيجة",
+      modeLabel: "اختر وضع الاختبار",
+      modes: {
+        silhouette: {
+          icon: "🌑",
+          title: "من هذا البوكيمون؟",
+          desc: "تعرّف على البوكيمون من خلال ظله — التحدي الكلاسيكي.",
+        },
+        type: {
+          icon: "⚡",
+          title: "خبير الأنواع",
+          desc: "خمّن النوع الأساسي لكل بوكيمون يظهر أمامك.",
+        },
+        mixed: {
+          icon: "🎲",
+          title: "تحدي متنوع",
+          desc: "كلا الوضعين معاً — اختبار المعرفة الأقوى.",
+        },
+      },
+      diffLabel: "مستوى الصعوبة",
+      diffs: {
+        easy: { label: "مبتدئ", sub: "الجيل الأول", timer: "٢٠ث / سؤال" },
+        medium: {
+          label: "مدرب",
+          sub: "الجيل الأول–الثالث",
+          timer: "١٥ث / سؤال",
+        },
+        hard: { label: "بطل", sub: "جميع الأجيال", timer: "١٠ث / سؤال" },
+      },
+      features: ["١٠ أسئلة", "تتابع", "مكافأة الوقت", "تقييم أ–هـ"],
+      cta: "ابدأ الاختبار",
+      ctaArrow: "←",
+      poweredBy: "١٠ أسئلة · مدعوم من PokéAPI.co",
+    },
+    quiz: {
+      scoreLabel: "النتيجة",
+      modeSilhouette: "من هذا البوكيمون؟",
+      modeType: "ما نوع هذا البوكيمون؟",
+      timeLabel: "ث",
+      correct: "صحيح!",
+      wrong: "خطأ!",
+      timeout: "انتهى الوقت!",
+      streakMsg: (n) => `${n} إجابات صحيحة متتالية!`,
+      answerLabel: "الإجابة",
+      showStats: "عرض الإحصاءات الأساسية ▼",
+      hideStats: "إخفاء الإحصاءات ▲",
+      loadingLabel: (q, t) => `جارٍ تحميل السؤال ${q} من ${t}…`,
+      statLabels: { hp: "ص.ح", atk: "هجوم", def: "دفاع", spd: "سرعة" },
+    },
+    results: {
+      grades: {
+        S: { title: "سيد بوكيمون!", sub: "إنجاز أسطوري!" },
+        A: { title: "قائد صالة!", sub: "معرفة استثنائية!" },
+        B: { title: "مدرب متقدم", sub: "أداء رائع!" },
+        C: { title: "مدرب بوكيمون", sub: "استمر في التدريب!" },
+        D: { title: "عضو فريق روكيت", sub: "عُد إلى الأساسيات!" },
+      },
+      correct: (n, t) => `${n}/${t} صحيحة`,
+      accuracy: (p) => `دقة ${p}٪`,
+      stats: {
+        score: "النتيجة النهائية",
+        accuracy: "الدقة",
+        streak: "أفضل تتابع",
+        avgTime: "متوسط الإجابة",
+      },
+      diffLabels: {
+        easy: "مبتدئ · الجيل الأول",
+        medium: "مدرب · الجيل الأول–الثالث",
+        hard: "بطل · جميع الأجيال",
+      },
+      diffIcons: { easy: "🟢", medium: "🟡", hard: "🔴" },
+      recapTitle: "ملخص الأسئلة",
+      timeout: "انتهى الوقت",
+      tip: "💡 نصيحة: ادرس تطابقات الأنواع وبوكيمون الجيل الأول أولاً — إنها الأكثر ظهوراً!",
+      sRankMsg: "🏅 تقييم S! أنت سيد بوكيمون حقيقي!",
+      playAgain: "العب مجدداً",
+      playAgainArrow: "←",
+      changeSettings: "تغيير الإعدادات →",
+      poweredBy: "مدعوم من PokéAPI.co",
+    },
+  },
+};
