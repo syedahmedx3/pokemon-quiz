@@ -21,10 +21,10 @@ export async function fetchPk(id) {
       d.sprites.front_shiny,
     types: d.types.map((t) => t.type.name),
     stats: {
-      hp:      d.stats[0]?.base_stat ?? 0,
-      attack:  d.stats[1]?.base_stat ?? 0,
+      hp: d.stats[0]?.base_stat ?? 0,
+      attack: d.stats[1]?.base_stat ?? 0,
       defense: d.stats[2]?.base_stat ?? 0,
-      speed:   d.stats[5]?.base_stat ?? 0,
+      speed: d.stats[5]?.base_stat ?? 0,
     },
   });
 }
