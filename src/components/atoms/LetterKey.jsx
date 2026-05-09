@@ -4,16 +4,18 @@ export default function LetterKey({ letter }) {
       style={{
         width: 26,
         height: 26,
-        borderRadius: 7,
+        borderRadius: "var(--r-sm)",
         flexShrink: 0,
-        background: "rgba(255,255,255,.07)",
-        display: "flex",
+        background: "var(--color-parchment)",
+        border: "1px solid var(--color-hairline)",
+        display: "inline-flex",
         alignItems: "center",
         justifyContent: "center",
         fontSize: 11,
-        fontWeight: 800,
-        color: "rgba(255,255,255,.42)",
+        fontWeight: 700,
+        color: "var(--color-ink-48)",
       }}
+      aria-hidden="true"
     >
       {letter}
     </span>
