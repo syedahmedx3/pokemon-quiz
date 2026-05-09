@@ -1,352 +1,394 @@
 import { DIFF_CFG, TCOLOR } from "../constants/config.js";
 import { getGrade } from "../utils/game.js";
-import { cap, hexRgb } from "../utils/helpers.js";
+import { cap } from "../utils/helpers.js";
+import { STRINGS } from "../i18n/strings.js";
 import TypeBadge from "./atoms/TypeBadge.jsx";
 
-export default function Results({ data, onHome, onRetry }) {
+export default function Results({ data, onHome, onRetry, lang }) {
+  const s = STRINGS[lang].results;
   const { score, results, diff } = data;
+
   const numCorrect = results.filter((r) => r.correct).length;
-  const pct        = Math.round((numCorrect / results.length) * 100);
-  const { g, c: gc, t: gt, s: gs } = getGrade(pct);
+  const pct = Math.round((numCorrect / results.length) * 100);
+  const { g, c: gc, t: gt, sub: gs } = getGrade(pct);
 
-  /* Best streak */
   const maxStreak = (() => {
-    let s = 0, mx = 0;
+    let run = 0,
+      best = 0;
     results.forEach((r) => {
-      if (r.correct) { s++; mx = Math.max(mx, s); }
-      else s = 0;
+      if (r.correct) {
+        run++;
+        best = Math.max(best, run);
+      } else run = 0;
     });
-    return mx;
+    return best;
   })();
 
-  /* Average answer time (excluding timeouts) */
   const avgTime = (() => {
-    const answered = results.filter((r) => r.sel !== null);
-    if (!answered.length) return 0;
-    const totalUsed = answered.reduce(
-      (a, r) => a + (DIFF_CFG[diff].time - r.tLeft),
-      0
+    const timed = results.filter((r) => r.sel !== null);
+    if (!timed.length) return 0;
+    return Math.round(
+      timed.reduce((a, r) => a + (DIFF_CFG[diff].time - r.tLeft), 0) /
+        timed.length,
     );
-    return Math.round(totalUsed / answered.length);
   })();
+
+  const gradeText = s.grades[g];
 
   return (
-    <div
-      className="fu"
-      style={{ padding: "24px 16px", maxWidth: 480, margin: "0 auto" }}
-    >
-      {/* ── Grade circle ── */}
-      <div style={{ textAlign: "center", marginBottom: 28 }}>
+    <main>
+      {/* ═══ GRADE HERO — dark tile ═══════════════════════════════ */}
+      <section
+        className="tile tile--dark"
+        style={{
+          paddingTop: "var(--sp-section)",
+          paddingBottom: "var(--sp-section)",
+          gap: "var(--sp-lg)",
+        }}
+      >
         <div
-          className="sci"
+          className="content-wrap"
           style={{
-            width: 118,
-            height: 118,
-            borderRadius: "50%",
-            margin: "0 auto 18px",
-            background: `rgba(${hexRgb(gc)},.11)`,
-            border: `3px solid ${gc}`,
             display: "flex",
             flexDirection: "column",
             alignItems: "center",
-            justifyContent: "center",
-            boxShadow: `0 0 50px rgba(${hexRgb(gc)},.32), inset 0 0 30px rgba(${hexRgb(gc)},.08)`,
+            gap: "var(--sp-lg)",
+            textAlign: "center",
           }}
         >
-          <span
+          {/* Grade circle */}
+          <div
+            className="grade-circle fade-up"
             style={{
-              fontFamily: "'Press Start 2P',monospace",
-              fontSize: 46,
               color: gc,
-              lineHeight: 1,
+              borderColor: gc,
+              boxShadow: `0 0 48px ${gc}44`,
             }}
+            aria-label={`Grade ${g}`}
           >
             {g}
+          </div>
+
+          {/* Grade title */}
+          <div className="fade-up" style={{ animationDelay: ".08s" }}>
+            <p
+              className="t-display-md"
+              style={{ color: "var(--color-on-dark)", marginBottom: 6 }}
+            >
+              {gradeText.title}
+            </p>
+            <p
+              className="t-body"
+              style={{ color: "var(--color-muted-on-dark)" }}
+            >
+              {gradeText.sub}
+            </p>
+          </div>
+
+          {/* Accuracy pill */}
+          <div
+            className="fade-up"
+            style={{
+              display: "inline-flex",
+              gap: 10,
+              alignItems: "center",
+              padding: "6px 20px",
+              background: "rgba(255,255,255,.08)",
+              border: "1px solid rgba(255,255,255,.18)",
+              borderRadius: "var(--r-pill)",
+              animationDelay: ".14s",
+            }}
+          >
+            <span
+              className="t-caption-strong"
+              style={{ color: "var(--color-on-dark)" }}
+            >
+              {s.correct(numCorrect, results.length)}
+            </span>
+            <span
+              style={{
+                width: 1,
+                height: 14,
+                background: "rgba(255,255,255,.2)",
+              }}
+              aria-hidden="true"
+            />
+            <span className="t-caption-strong" style={{ color: gc }}>
+              {s.accuracy(pct)}
+            </span>
+          </div>
+
+          {/* Difficulty chip */}
+          <span
+            className="fade-up"
+            style={{
+              display: "inline-flex",
+              alignItems: "center",
+              gap: 7,
+              padding: "5px 16px",
+              background: "rgba(255,255,255,.06)",
+              border: "1px solid rgba(255,255,255,.14)",
+              borderRadius: "var(--r-pill)",
+              fontSize: 13,
+              fontWeight: 600,
+              letterSpacing: "-0.12px",
+              color: "var(--color-muted-on-dark)",
+              animationDelay: ".18s",
+            }}
+          >
+            {s.diffIcons[diff]} {s.diffLabels[diff]}
           </span>
         </div>
-        <div style={{ fontSize: 23, fontWeight: 900, color: gc, marginBottom: 5 }}>
-          {gt}
-        </div>
-        <div style={{ fontSize: 13, color: "rgba(255,255,255,.4)", marginBottom: 8 }}>
-          {gs}
-        </div>
-        <div style={{ fontSize: 11, color: "rgba(255,255,255,.26)" }}>
-          {numCorrect}/{results.length} correct · {pct}% accuracy
-        </div>
-      </div>
+      </section>
 
-      {/* ── Stats grid ── */}
-      <div
+      {/* ═══ STATS GRID — white tile ══════════════════════════════ */}
+      <section
+        className="tile tile--light"
         style={{
-          display: "grid",
-          gridTemplateColumns: "1fr 1fr",
-          gap: 11,
-          marginBottom: 22,
+          paddingTop: "var(--sp-section)",
+          paddingBottom: "var(--sp-section)",
+          gap: "var(--sp-lg)",
         }}
       >
-        {[
-          { k: "FINAL SCORE",  v: score,       c: "#fbbf24" },
-          { k: "ACCURACY",     v: `${pct}%`,   c: gc },
-          { k: "BEST STREAK",  v: `×${maxStreak}`, c: "#fb923c" },
-          { k: "AVG ANSWER",   v: `${avgTime}s`,   c: "#60a5fa" },
-        ].map((s) => (
-          <div
-            key={s.k}
-            className="glass"
-            style={{ padding: "16px", textAlign: "center" }}
-          >
-            <div
-              style={{
-                fontSize: 9,
-                fontWeight: 700,
-                letterSpacing: 1.8,
-                color: "rgba(255,255,255,.28)",
-                marginBottom: 8,
-              }}
-            >
-              {s.k}
-            </div>
-            <div style={{ fontSize: 24, fontWeight: 800, color: s.c }}>
-              {s.v}
-            </div>
-          </div>
-        ))}
-      </div>
-
-      {/* ── Difficulty badge ── */}
-      <div style={{ textAlign: "center", marginBottom: 22 }}>
-        <span
+        <div
+          className="content-wrap"
           style={{
-            display: "inline-flex",
-            alignItems: "center",
-            gap: 8,
-            background: `rgba(${hexRgb(DIFF_CFG[diff].color)},.12)`,
-            border: `1px solid rgba(${hexRgb(DIFF_CFG[diff].color)},.3)`,
-            borderRadius: 10,
-            padding: "6px 16px",
-            fontSize: 11,
-            fontWeight: 700,
-            color: DIFF_CFG[diff].color,
+            display: "grid",
+            gridTemplateColumns: "1fr 1fr",
+            gap: 12,
+            width: "100%",
           }}
         >
-          {diff === "easy" ? "🟢" : diff === "medium" ? "🟡" : "🔴"}{" "}
-          {DIFF_CFG[diff].label} · {DIFF_CFG[diff].sub}
-        </span>
-      </div>
-
-      {/* ── Question recap ── */}
-      <div className="card" style={{ padding: "18px 18px 14px", marginBottom: 22 }}>
-        <div className="lbl">QUESTION RECAP</div>
-        <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-          {results.map((r, i) => (
+          {[
+            { k: s.stats.score, v: score, c: "#0066cc" },
+            { k: s.stats.accuracy, v: `${pct}%`, c: gc },
+            {
+              k: s.stats.streak,
+              v: `×${maxStreak}`,
+              c: "var(--color-warning)",
+            },
+            { k: s.stats.avgTime, v: `${avgTime}s`, c: "var(--color-ink-48)" },
+          ].map((stat) => (
             <div
-              key={i}
+              key={stat.k}
+              className="card-utility"
               style={{
                 display: "flex",
+                flexDirection: "column",
                 alignItems: "center",
-                gap: 11,
-                padding: "10px 12px",
-                borderRadius: 12,
-                background: r.correct
-                  ? "rgba(74,222,128,.065)"
-                  : "rgba(248,113,113,.065)",
-                border: `1px solid ${
-                  r.correct
-                    ? "rgba(74,222,128,.18)"
-                    : "rgba(248,113,113,.18)"
-                }`,
+                gap: 6,
+                textAlign: "center",
+                padding: "var(--sp-lg) var(--sp-md)",
               }}
             >
-              {/* Q number */}
-              <div
+              <span
+                className="t-caption"
                 style={{
-                  width: 24,
-                  height: 24,
-                  borderRadius: 6,
-                  flexShrink: 0,
-                  background: "rgba(255,255,255,.06)",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  fontSize: 10,
-                  fontWeight: 700,
-                  color: "rgba(255,255,255,.4)",
+                  color: "var(--color-ink-48)",
+                  textTransform: "uppercase",
+                  letterSpacing: "1.5px",
                 }}
               >
-                {i + 1}
-              </div>
-
-              {/* Sprite */}
-              <img
-                src={r.q.pk.sprite}
-                alt={cap(r.q.pk.name)}
+                {stat.k}
+              </span>
+              <span
                 style={{
-                  width: 40,
-                  height: 40,
-                  objectFit: "contain",
-                  flexShrink: 0,
-                  filter: r.correct ? "none" : "grayscale(.55)",
+                  fontSize: 26,
+                  fontWeight: 700,
+                  letterSpacing: "-0.5px",
+                  color: stat.c,
                 }}
-              />
-
-              {/* Name + types */}
-              <div style={{ flex: 1, minWidth: 0 }}>
-                <div
-                  style={{
-                    fontSize: 13,
-                    fontWeight: 800,
-                    whiteSpace: "nowrap",
-                    overflow: "hidden",
-                    textOverflow: "ellipsis",
-                  }}
-                >
-                  {cap(r.q.pk.name)}
-                </div>
-                <div
-                  style={{
-                    display: "flex",
-                    gap: 4,
-                    marginTop: 4,
-                    flexWrap: "wrap",
-                  }}
-                >
-                  {r.q.pk.types.map((t) => (
-                    <span
-                      key={t}
-                      style={{
-                        background: TCOLOR[t] || "#555",
-                        color: "#fff",
-                        padding: "1px 7px",
-                        borderRadius: 8,
-                        fontSize: 8.5,
-                        fontWeight: 700,
-                      }}
-                    >
-                      {t}
-                    </span>
-                  ))}
-                </div>
-              </div>
-
-              {/* Points / wrong guess */}
-              <div style={{ textAlign: "right", flexShrink: 0 }}>
-                <div
-                  style={{
-                    fontSize: 13,
-                    fontWeight: 800,
-                    color: r.correct ? "#4ade80" : "#f87171",
-                  }}
-                >
-                  {r.correct ? `+${r.pts}` : "✗"}
-                </div>
-                {!r.correct && r.sel && (
-                  <div
-                    style={{
-                      fontSize: 9.5,
-                      color: "rgba(255,255,255,.3)",
-                      marginTop: 2,
-                    }}
-                  >
-                    {r.q.mode === "type" ? r.sel : cap(r.sel)}
-                  </div>
-                )}
-                {!r.correct && !r.sel && (
-                  <div
-                    style={{
-                      fontSize: 9.5,
-                      color: "rgba(255,255,255,.28)",
-                      marginTop: 2,
-                    }}
-                  >
-                    timeout
-                  </div>
-                )}
-              </div>
+              >
+                {stat.v}
+              </span>
             </div>
           ))}
         </div>
-      </div>
+      </section>
 
-      {/* ── Contextual messages ── */}
-      {pct < 65 && (
-        <div
-          className="glow-card"
-          style={{ padding: "14px 18px", marginBottom: 22, textAlign: "center" }}
-        >
-          <div
-            style={{
-              fontSize: 13,
-              fontWeight: 700,
-              color: "rgba(180,175,255,.85)",
-              lineHeight: 1.7,
-            }}
-          >
-            💡 Tip: Study type matchups and Gen I Pokémon first — they appear most in all difficulties!
-          </div>
-        </div>
-      )}
-      {pct >= 90 && (
-        <div
-          style={{
-            padding: "14px 18px",
-            marginBottom: 22,
-            textAlign: "center",
-            background: "rgba(255,215,0,.08)",
-            border: "1px solid rgba(255,215,0,.25)",
-            borderRadius: 18,
-          }}
-        >
-          <div style={{ fontSize: 14, fontWeight: 700, color: "#fbbf24" }}>
-            🏅 S-Rank! You're a true Pokémon Master!
-          </div>
-        </div>
-      )}
-
-      {/* ── Actions ── */}
-      <div style={{ display: "flex", flexDirection: "column", gap: 11 }}>
-        <button
-          onClick={onRetry}
-          className="shimmer-btn"
-          style={{
-            padding: "17px",
-            borderRadius: 15,
-            border: "none",
-            color: "#fff",
-            fontSize: 15,
-            fontWeight: 800,
-            boxShadow: "0 8px 30px rgba(99,102,241,.45)",
-            letterSpacing: 0.5,
-          }}
-        >
-          PLAY AGAIN →
-        </button>
-        <button
-          onClick={onHome}
-          style={{
-            padding: "15px",
-            borderRadius: 15,
-            background: "rgba(255,255,255,.05)",
-            border: "1.5px solid rgba(255,255,255,.1)",
-            color: "rgba(255,255,255,.62)",
-            fontSize: 14,
-            fontWeight: 700,
-          }}
-        >
-          ← Change Settings
-        </button>
-      </div>
-
-      <p
+      {/* ═══ QUESTION RECAP — parchment tile ══════════════════════ */}
+      <section
+        className="tile tile--parchment"
         style={{
-          textAlign: "center",
-          fontSize: 9,
-          color: "rgba(255,255,255,.15)",
-          letterSpacing: 1.5,
-          marginTop: 22,
+          paddingTop: "var(--sp-section)",
+          paddingBottom: "var(--sp-section)",
+          gap: "var(--sp-lg)",
+          alignItems: "stretch",
         }}
       >
-        POWERED BY POKÉAPI.CO
-      </p>
-    </div>
+        <div
+          className="content-wrap"
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            gap: "var(--sp-lg)",
+            width: "100%",
+          }}
+        >
+          <h2 className="t-tagline" style={{ color: "var(--color-ink)" }}>
+            {s.recapTitle}
+          </h2>
+
+          <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+            {results.map((r, i) => (
+              <div
+                key={i}
+                className="card-utility"
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 12,
+                  padding: "12px 14px",
+                  background: r.correct
+                    ? "rgba(52,199,89,.06)"
+                    : "rgba(255,59,48,.06)",
+                  border: `1px solid ${r.correct ? "rgba(52,199,89,.22)" : "rgba(255,59,48,.22)"}`,
+                  borderRadius: "var(--r-lg)",
+                }}
+              >
+                {/* Q number */}
+                <span
+                  className="t-caption"
+                  style={{
+                    width: 22,
+                    height: 22,
+                    borderRadius: "var(--r-sm)",
+                    flexShrink: 0,
+                    background: "var(--color-canvas)",
+                    border: "1px solid var(--color-hairline)",
+                    display: "inline-flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    color: "var(--color-ink-48)",
+                    fontWeight: 700,
+                  }}
+                >
+                  {i + 1}
+                </span>
+
+                {/* Sprite */}
+                <img
+                  src={r.q.pk.sprite}
+                  alt={cap(r.q.pk.name)}
+                  style={{
+                    width: 42,
+                    height: 42,
+                    objectFit: "contain",
+                    flexShrink: 0,
+                    filter: r.correct ? "none" : "grayscale(.55)",
+                    /* product shadow on sprites */
+                    filter: r.correct
+                      ? "drop-shadow(rgba(0,0,0,0.22) 2px 3px 12px)"
+                      : "grayscale(.55) drop-shadow(rgba(0,0,0,0.10) 2px 3px 8px)",
+                  }}
+                />
+
+                {/* Name + types */}
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <p
+                    className="t-body-strong"
+                    style={{
+                      whiteSpace: "nowrap",
+                      overflow: "hidden",
+                      textOverflow: "ellipsis",
+                    }}
+                  >
+                    {cap(r.q.pk.name)}
+                  </p>
+                  <div
+                    style={{
+                      display: "flex",
+                      gap: 4,
+                      marginTop: 4,
+                      flexWrap: "wrap",
+                    }}
+                  >
+                    {r.q.pk.types.map((t) => (
+                      <span
+                        key={t}
+                        className="type-badge"
+                        style={{ background: TCOLOR[t] || "#555", fontSize: 8 }}
+                      >
+                        {t}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Score or wrong guess */}
+                <div style={{ textAlign: "end", flexShrink: 0 }}>
+                  <p
+                    className="t-body-strong"
+                    style={{
+                      color: r.correct
+                        ? "var(--color-success)"
+                        : "var(--color-danger)",
+                    }}
+                  >
+                    {r.correct ? `+${r.pts}` : "✗"}
+                  </p>
+                  {!r.correct && (
+                    <p className="t-fine-print" style={{ marginTop: 2 }}>
+                      {r.sel
+                        ? r.q.mode === "type"
+                          ? r.sel
+                          : cap(r.sel)
+                        : s.timeout}
+                    </p>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Contextual message */}
+          {pct < 65 && (
+            <div
+              style={{
+                padding: "14px 18px",
+                borderRadius: "var(--r-lg)",
+                background: "rgba(0,102,204,.06)",
+                border: "1px solid rgba(0,102,204,.18)",
+              }}
+            >
+              <p
+                className="t-caption"
+                style={{ color: "var(--color-ink)", lineHeight: 1.6 }}
+              >
+                {s.tip}
+              </p>
+            </div>
+          )}
+          {pct >= 90 && (
+            <div
+              style={{
+                padding: "14px 18px",
+                borderRadius: "var(--r-lg)",
+                background: "rgba(255,215,0,.10)",
+                border: "1px solid rgba(255,200,0,.30)",
+                textAlign: "center",
+              }}
+            >
+              <p className="t-body-strong" style={{ color: "#996600" }}>
+                {s.sRankMsg}
+              </p>
+            </div>
+          )}
+        </div>
+      </section>
+
+      {/* ═══ STICKY ACTION BAR ════════════════════════════════════ */}
+      <div className="sticky-bar">
+        <button className="btn-primary-full" onClick={onRetry}>
+          {s.playAgain}&nbsp;<span aria-hidden="true">{s.playAgainArrow}</span>
+        </button>
+        <button className="btn-secondary-full" onClick={onHome}>
+          {s.changeSettings}
+        </button>
+        <p className="t-fine-print" style={{ textAlign: "center" }}>
+          {s.poweredBy}
+        </p>
+      </div>
+    </main>
   );
 }
