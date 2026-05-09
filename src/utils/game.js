@@ -10,7 +10,7 @@ import { DIFF_CFG, ALL_TYPES } from "../constants/config.js";
 export async function buildQ(mode, diff) {
   const [lo, hi] = DIFF_CFG[diff].range;
   const cid = rnd(lo, hi);
-  const pk  = await fetchPk(cid);
+  const pk = await fetchPk(cid);
 
   if (mode === "type") {
     const wrongs = shuf(ALL_TYPES.filter((t) => t !== pk.types[0])).slice(0, 3);
@@ -58,9 +58,9 @@ export async function preloadQ(mode, diff, idx) {
  *   - multiplier  1.0 → 1.6 scaling with streak (capped at ×6)
  */
 export function calcPts(tLeft, maxT, streak) {
-  const base      = 100;
+  const base = 100;
   const timeBonus = Math.round((tLeft / maxT) * 50);
-  const mult      = 1 + Math.min(streak, 6) * 0.1;
+  const mult = 1 + Math.min(streak, 6) * 0.1;
   return Math.round((base + timeBonus) * mult);
 }
 
@@ -68,11 +68,40 @@ export function calcPts(tLeft, maxT, streak) {
  * Letter grade + flavour text based on accuracy percentage.
  */
 export function getGrade(pct) {
-  if (pct >= 90) return { g: "S", c: "#ffd700", t: "Pokémon Master!",   s: "A legendary achievement!" };
-  if (pct >= 80) return { g: "A", c: "#4ade80", t: "Gym Leader!",       s: "Outstanding knowledge!" };
-  if (pct >= 65) return { g: "B", c: "#60a5fa", t: "Senior Trainer",    s: "Great performance!" };
-  if (pct >= 45) return { g: "C", c: "#f97316", t: "Pokémon Trainer",   s: "Keep practicing!" };
-                 return { g: "D", c: "#f87171", t: "Team Rocket Grunt",  s: "Back to the basics!" };
+  if (pct >= 90)
+    return {
+      g: "S",
+      c: "#ffd700",
+      t: "Pokémon Master!",
+      s: "A legendary achievement!",
+    };
+  if (pct >= 80)
+    return {
+      g: "A",
+      c: "#4ade80",
+      t: "Gym Leader!",
+      s: "Outstanding knowledge!",
+    };
+  if (pct >= 65)
+    return {
+      g: "B",
+      c: "#60a5fa",
+      t: "Senior Trainer",
+      s: "Great performance!",
+    };
+  if (pct >= 45)
+    return {
+      g: "C",
+      c: "#f97316",
+      t: "Pokémon Trainer",
+      s: "Keep practicing!",
+    };
+  return {
+    g: "D",
+    c: "#f87171",
+    t: "Team Rocket Grunt",
+    s: "Back to the basics!",
+  };
 }
 
 /**
