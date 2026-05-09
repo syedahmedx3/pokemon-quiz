@@ -1,180 +1,209 @@
-import { DIFF_CFG, TOTAL_Q } from "../constants/config.js";
-import { hexRgb } from "../utils/helpers.js";
+import { DIFF_CFG } from "../constants/config.js";
+import { STRINGS } from "../i18n/strings.js";
 
-const MODES = [
-  {
-    k: "silhouette",
-    icon: "🌑",
-    t: "Who's That Pokémon?",
-    d: "Identify from the shadow — the classic challenge",
-  },
-  {
-    k: "type",
-    icon: "⚡",
-    t: "Type Expert",
-    d: "Name the primary type of each Pokémon",
-  },
-  {
-    k: "mixed",
-    icon: "🎲",
-    t: "Mixed Challenge",
-    d: "Both modes combined — the ultimate knowledge test",
-  },
-];
+const MODE_KEYS = ["silhouette", "type", "mixed"];
+const DIFF_KEYS = ["easy", "medium", "hard"];
 
-export default function Home({ mode, setMode, diff, setDiff, best, onStart }) {
+export default function Home({
+  mode,
+  setMode,
+  diff,
+  setDiff,
+  best,
+  onStart,
+  lang,
+}) {
+  const s = STRINGS[lang].home;
+
   return (
-    <div
-      style={{
-        padding: "24px 16px",
-        maxWidth: 480,
-        margin: "0 auto",
-        display: "flex",
-        flexDirection: "column",
-        gap: 24,
-      }}
-    >
-      {/* ── Hero ── */}
-      <div className="fu" style={{ textAlign: "center", paddingTop: 16 }}>
+    <main>
+      {/* ═══ HERO — parchment tile ════════════════════════════════ */}
+      <section
+        className="tile tile--parchment"
+        style={{
+          paddingTop: "var(--sp-section)",
+          paddingBottom: 0,
+          gap: "var(--sp-lg)",
+        }}
+      >
         <div
+          className="content-wrap"
           style={{
-            display: "inline-flex",
+            display: "flex",
+            flexDirection: "column",
             alignItems: "center",
-            gap: 8,
-            marginBottom: 18,
-            background: "rgba(99,102,241,.14)",
-            border: "1px solid rgba(99,102,241,.32)",
-            borderRadius: 30,
-            padding: "5px 16px",
-            fontSize: 9.5,
-            fontWeight: 700,
-            letterSpacing: 2,
-            color: "rgba(180,175,255,.9)",
+            gap: "var(--sp-lg)",
+            textAlign: "center",
           }}
         >
-          ⭐ PROFESSOR OAK'S ACADEMY
-        </div>
+          {/* Eyebrow */}
+          <span className="eyebrow-pill fade-up">⭐ {s.eyebrow}</span>
 
-        <h1
-          className="shimmer-text"
-          style={{
-            fontFamily: "'Press Start 2P', monospace",
-            fontSize: "clamp(14px, 3.4vw, 21px)",
-            lineHeight: 1.6,
-            marginBottom: 16,
-          }}
-        >
-          POKÉMON
-          <br />
-          KNOWLEDGE
-          <br />
-          TEST
-        </h1>
+          {/* Hero headline */}
+          <h1
+            className="t-hero fade-up"
+            style={{ color: "var(--color-ink)", animationDelay: ".06s" }}
+          >
+            {s.headline.map((line, i) => (
+              <span key={i} style={{ display: "block" }}>
+                {line}
+              </span>
+            ))}
+          </h1>
 
-        <p style={{ color: "rgba(255,255,255,.38)", fontSize: 13.5, lineHeight: 1.8 }}>
-          How well do you{" "}
-          <span style={{ color: "rgba(180,175,255,.75)", fontWeight: 700 }}>
-            really
-          </span>{" "}
-          know your Pokémon?
-          <br />
-          Prove it across {TOTAL_Q} timed questions.
-        </p>
-
-        {best > 0 && (
-          <div
+          {/* Tagline */}
+          <p
+            className="t-body fade-up"
             style={{
-              display: "inline-flex",
-              alignItems: "center",
-              gap: 8,
-              marginTop: 14,
-              background: "rgba(245,158,11,.09)",
-              border: "1px solid rgba(245,158,11,.25)",
-              borderRadius: 12,
-              padding: "7px 18px",
-              fontSize: 12,
-              color: "#fbbf24",
-              fontWeight: 700,
+              color: "var(--color-ink-48)",
+              maxWidth: 460,
+              animationDelay: ".12s",
             }}
           >
-            🏆 Personal Best: {best}
-          </div>
-        )}
-      </div>
+            {s.tagline}
+          </p>
 
-      {/* ── Mode selector ── */}
-      <div className="fu stagger">
-        <div className="lbl">SELECT QUIZ MODE</div>
-        <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-          {MODES.map((m) => {
-            const active = mode === m.k;
+          {/* Best score */}
+          {best > 0 && (
+            <div
+              className="fade-up"
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                gap: 8,
+                padding: "6px 18px",
+                background: "var(--color-canvas)",
+                border: "1px solid var(--color-hairline)",
+                borderRadius: "var(--r-pill)",
+                animationDelay: ".16s",
+              }}
+            >
+              <span className="t-caption-strong">🏆 {s.bestScore}:</span>
+              <span
+                className="t-caption-strong"
+                style={{ color: "var(--color-primary)" }}
+              >
+                {best}
+              </span>
+            </div>
+          )}
+
+          {/* Divider to next section */}
+          <div style={{ height: "var(--sp-section)" }} />
+        </div>
+      </section>
+
+      {/* ═══ MODE SELECTION — dark tile ══════════════════════════ */}
+      <section
+        className="tile tile--dark"
+        style={{
+          paddingTop: "var(--sp-section)",
+          paddingBottom: "var(--sp-section)",
+          gap: "var(--sp-md)",
+          textAlign: "start",
+        }}
+      >
+        <div
+          className="content-wrap"
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            gap: "var(--sp-md)",
+            width: "100%",
+          }}
+        >
+          <p
+            className="t-caption-strong"
+            style={{
+              color: "var(--color-muted-on-dark)",
+              textTransform: "uppercase",
+              letterSpacing: "2px",
+            }}
+          >
+            {s.modeLabel}
+          </p>
+
+          {MODE_KEYS.map((k) => {
+            const m = s.modes[k];
+            const active = mode === k;
             return (
               <button
-                key={m.k}
-                onClick={() => setMode(m.k)}
+                key={k}
+                onClick={() => setMode(k)}
+                aria-pressed={active}
                 style={{
                   display: "flex",
                   alignItems: "center",
-                  gap: 14,
+                  gap: 16,
                   padding: "14px 16px",
-                  borderRadius: 16,
-                  textAlign: "left",
+                  borderRadius: "var(--r-lg)",
                   width: "100%",
+                  textAlign: "start",
                   background: active
-                    ? "rgba(99,102,241,.17)"
-                    : "rgba(255,255,255,.035)",
+                    ? "rgba(255,255,255,.10)"
+                    : "rgba(255,255,255,.04)",
                   border: active
-                    ? "1.5px solid rgba(99,102,241,.58)"
+                    ? "1.5px solid rgba(255,255,255,.35)"
                     : "1.5px solid rgba(255,255,255,.08)",
-                  color: "#e8e8ff",
+                  cursor: "pointer",
+                  fontFamily: "var(--font)",
+                  transition: "background .15s, border-color .15s",
                 }}
               >
+                {/* Icon box */}
                 <div
                   style={{
                     width: 46,
                     height: 46,
-                    borderRadius: 12,
+                    borderRadius: "var(--r-sm)",
                     flexShrink: 0,
                     background: active
-                      ? "rgba(99,102,241,.28)"
-                      : "rgba(255,255,255,.06)",
+                      ? "rgba(255,255,255,.16)"
+                      : "rgba(255,255,255,.07)",
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "center",
                     fontSize: 22,
-                    transition: "background .2s",
+                    transition: "background .15s",
                   }}
                 >
                   {m.icon}
                 </div>
-                <div style={{ flex: 1 }}>
-                  <div style={{ fontSize: 14, fontWeight: 800, marginBottom: 2 }}>
-                    {m.t}
+
+                {/* Label */}
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div
+                    className="t-body-strong"
+                    style={{ color: "var(--color-on-dark)", marginBottom: 2 }}
+                  >
+                    {m.title}
                   </div>
                   <div
-                    style={{
-                      fontSize: 11,
-                      color: "rgba(255,255,255,.36)",
-                      lineHeight: 1.4,
-                    }}
+                    className="t-caption"
+                    style={{ color: "var(--color-muted-on-dark)" }}
                   >
-                    {m.d}
+                    {m.desc}
                   </div>
                 </div>
+
+                {/* Radio dot */}
                 <div
                   style={{
                     width: 22,
                     height: 22,
                     borderRadius: "50%",
                     flexShrink: 0,
-                    background: active ? "#6366f1" : "rgba(255,255,255,.07)",
-                    border: active ? "none" : "1px solid rgba(255,255,255,.15)",
+                    background: active ? "var(--color-primary)" : "transparent",
+                    border: active
+                      ? "none"
+                      : "1.5px solid rgba(255,255,255,.28)",
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "center",
                     fontSize: 11,
                     color: "#fff",
-                    transition: "all .2s",
+                    fontWeight: 700,
+                    transition: "all .15s",
                   }}
                 >
                   {active ? "✓" : ""}
@@ -183,105 +212,144 @@ export default function Home({ mode, setMode, diff, setDiff, best, onStart }) {
             );
           })}
         </div>
-      </div>
+      </section>
 
-      {/* ── Difficulty ── */}
-      <div className="fu">
-        <div className="lbl">DIFFICULTY</div>
+      {/* ═══ DIFFICULTY — white tile ══════════════════════════════ */}
+      <section
+        className="tile tile--light"
+        style={{
+          paddingTop: "var(--sp-section)",
+          paddingBottom: "var(--sp-section)",
+          gap: "var(--sp-md)",
+        }}
+      >
         <div
-          style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 10 }}
+          className="content-wrap"
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            gap: "var(--sp-md)",
+            width: "100%",
+          }}
         >
-          {Object.entries(DIFF_CFG).map(([k, d]) => {
-            const active = diff === k;
-            return (
-              <button
-                key={k}
-                onClick={() => setDiff(k)}
+          <p
+            className="t-caption-strong"
+            style={{
+              color: "var(--color-ink-48)",
+              textTransform: "uppercase",
+              letterSpacing: "2px",
+            }}
+          >
+            {s.diffLabel}
+          </p>
+
+          <div
+            style={{
+              display: "grid",
+              gridTemplateColumns: "repeat(3,1fr)",
+              gap: 10,
+            }}
+          >
+            {DIFF_KEYS.map((k) => {
+              const d = s.diffs[k];
+              const cfg = DIFF_CFG[k];
+              const active = diff === k;
+              return (
+                <button
+                  key={k}
+                  onClick={() => setDiff(k)}
+                  aria-pressed={active}
+                  style={{
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "center",
+                    gap: 4,
+                    padding: "14px 8px",
+                    background: "var(--color-canvas)",
+                    border: active
+                      ? `2px solid ${cfg.color}`
+                      : "1px solid var(--color-hairline)",
+                    borderRadius: "var(--r-lg)",
+                    cursor: "pointer",
+                    fontFamily: "var(--font)",
+                    transition: "border-color .15s",
+                  }}
+                >
+                  <span
+                    className="t-body-strong"
+                    style={{ color: active ? cfg.color : "var(--color-ink)" }}
+                  >
+                    {d.label}
+                  </span>
+                  <span
+                    className="t-caption"
+                    style={{ color: "var(--color-ink-48)" }}
+                  >
+                    {d.sub}
+                  </span>
+                  <span className="t-fine-print">{d.timer}</span>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      </section>
+
+      {/* ═══ FEATURE STRIP — parchment tile ══════════════════════ */}
+      <section
+        className="tile tile--parchment"
+        style={{ paddingTop: "var(--sp-xxl)", paddingBottom: "var(--sp-xxl)" }}
+      >
+        <div className="content-wrap" style={{ width: "100%" }}>
+          <div
+            style={{
+              display: "grid",
+              gridTemplateColumns: "repeat(4,1fr)",
+              gap: 8,
+            }}
+          >
+            {[
+              ["📝", 0],
+              ["🔥", 1],
+              ["⏱", 2],
+              ["🎖", 3],
+            ].map(([icon, i]) => (
+              <div
+                key={i}
                 style={{
-                  padding: "14px 8px",
-                  borderRadius: 14,
-                  textAlign: "center",
-                  background: active
-                    ? `rgba(${hexRgb(d.color)},.15)`
-                    : "rgba(255,255,255,.035)",
-                  border: active
-                    ? `1.5px solid ${d.color}`
-                    : "1.5px solid rgba(255,255,255,.08)",
-                  color: active ? d.color : "rgba(255,255,255,.42)",
-                  transition: "all .2s",
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "center",
+                  gap: 8,
                 }}
               >
-                <div style={{ fontSize: 15, fontWeight: 800 }}>{d.label}</div>
-                <div style={{ fontSize: 10, marginTop: 4, opacity: 0.75 }}>
-                  {d.sub}
-                </div>
-                <div style={{ fontSize: 10, marginTop: 3, opacity: 0.5 }}>
-                  ⏱ {d.time}s / Q
-                </div>
-              </button>
-            );
-          })}
-        </div>
-      </div>
-
-      {/* ── Feature strip ── */}
-      <div
-        className="glass"
-        style={{
-          padding: "14px 10px",
-          display: "grid",
-          gridTemplateColumns: "repeat(4,1fr)",
-        }}
-      >
-        {[
-          ["📝", "10 Qs"],
-          ["🔥", "Streaks"],
-          ["⏱", "Time Bonus"],
-          ["🎖", "S–D Grade"],
-        ].map(([icon, label]) => (
-          <div key={label} style={{ textAlign: "center" }}>
-            <div style={{ fontSize: 20, marginBottom: 5 }}>{icon}</div>
-            <div
-              style={{
-                fontSize: 9.5,
-                color: "rgba(255,255,255,.38)",
-                fontWeight: 600,
-              }}
-            >
-              {label}
-            </div>
+                <span style={{ fontSize: 22 }} aria-hidden="true">
+                  {icon}
+                </span>
+                <span
+                  className="t-caption"
+                  style={{ color: "var(--color-ink-48)", textAlign: "center" }}
+                >
+                  {s.features[i]}
+                </span>
+              </div>
+            ))}
           </div>
-        ))}
+        </div>
+      </section>
+
+      {/* ═══ STICKY START BAR ═════════════════════════════════════ */}
+      <div className="sticky-bar">
+        <button className="btn-primary-full" onClick={onStart}>
+          {s.cta}&nbsp;<span aria-hidden="true">{s.ctaArrow}</span>
+        </button>
+        <p
+          className="t-fine-print"
+          style={{ textAlign: "center", color: "var(--color-ink-48)" }}
+        >
+          {s.poweredBy}
+        </p>
       </div>
-
-      {/* ── Start CTA ── */}
-      <button
-        onClick={onStart}
-        className="shimmer-btn"
-        style={{
-          padding: "18px",
-          borderRadius: 16,
-          border: "none",
-          color: "#fff",
-          fontSize: 16,
-          fontWeight: 800,
-          letterSpacing: 0.5,
-          boxShadow: "0 8px 36px rgba(99,102,241,.45)",
-        }}
-      >
-        START THE TEST →
-      </button>
-
-      <p
-        style={{
-          textAlign: "center",
-          fontSize: 9,
-          color: "rgba(255,255,255,.18)",
-          letterSpacing: 1.5,
-        }}
-      >
-        {TOTAL_Q} QUESTIONS · POWERED BY POKÉAPI.CO
-      </p>
-    </div>
+    </main>
   );
 }
