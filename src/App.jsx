@@ -1,68 +1,97 @@
 import { useState, useCallback } from "react";
-import Home    from "./components/Home.jsx";
-import Quiz    from "./components/Quiz.jsx";
+import { STRINGS } from "./i18n/strings.js";
+import GlobalNav from "./components/GlobalNav.jsx";
+import Home from "./components/Home.jsx";
+import Quiz from "./components/Quiz.jsx";
 import Results from "./components/Results.jsx";
 
 /**
- * App
- * ───
- * Top-level router. Three screens: home → quiz → results.
- *
- * State owned here:
- *   screen   – which screen is visible
- *   mode     – quiz mode  (silhouette | type | mixed)
- *   diff     – difficulty (easy | medium | hard)
- *   result   – data object returned by Quiz when the round ends
- *   best     – all-time high score (session-persisted in memory)
- *   gameKey  – incremented each new game to force a full Quiz remount
- *              so no stale refs / timers survive between rounds
+ * App — root router
+ * ─────────────────
+ * Owns:
+ *   screen   home | quiz | results
+ *   mode     silhouette | type | mixed
+ *   diff     easy | medium | hard
+ *   lang     en | ar
+ *   result   data returned by Quiz
+ *   best     session high score
+ *   gameKey  forces full Quiz remount on every new game
+ *   score    live score surfaced to GlobalNav during quiz
  */
 export default function App() {
-  const [screen,  setScreen]  = useState("home");
-  const [mode,    setMode]    = useState("silhouette");
-  const [diff,    setDiff]    = useState("easy");
-  const [result,  setResult]  = useState(null);
-  const [best,    setBest]    = useState(0);
+  const [screen, setScreen] = useState("home");
+  const [mode, setMode] = useState("silhouette");
+  const [diff, setDiff] = useState("easy");
+  const [lang, setLang] = useState("en");
+  const [result, setResult] = useState(null);
+  const [best, setBest] = useState(0);
   const [gameKey, setGameKey] = useState(0);
+  const [liveScore, setLiveScore] = useState(null);
 
-  /** Called by Quiz when all questions are answered or lives run out */
+  const dir = STRINGS[lang].dir;
+
+  /** Toggle between English and Arabic */
+  const handleToggleLang = () => {
+    setLang((l) => (l === "en" ? "ar" : "en"));
+  };
+
+  /** Called by Quiz when round ends */
   const handleDone = useCallback(
     (data) => {
       if (data.score > best) setBest(data.score);
       setResult(data);
+      setLiveScore(null);
       setScreen("results");
     },
-    [best]
+    [best],
   );
 
-  /** Start a fresh game from the Home screen */
+  /** Start fresh game */
   const handleStart = () => {
+    setLiveScore(0);
     setGameKey((k) => k + 1);
     setScreen("quiz");
   };
 
-  /** Replay with the same settings from the Results screen */
+  /** Replay with same settings */
   const handleRetry = () => {
+    setLiveScore(0);
     setGameKey((k) => k + 1);
     setScreen("quiz");
   };
 
   return (
-    <div className="R">
+    /* dir attribute drives RTL for the entire app */
+    <div
+      dir={dir}
+      lang={lang}
+      style={{ minHeight: "100vh", background: "var(--color-canvas)" }}
+    >
+      {/* Global nav persists across all screens */}
+      <GlobalNav
+        lang={lang}
+        onToggleLang={handleToggleLang}
+        score={screen === "quiz" ? liveScore : null}
+      />
+
       {screen === "home" && (
         <Home
-          mode={mode}   setMode={setMode}
-          diff={diff}   setDiff={setDiff}
+          mode={mode}
+          setMode={setMode}
+          diff={diff}
+          setDiff={setDiff}
           best={best}
           onStart={handleStart}
+          lang={lang}
         />
       )}
 
       {screen === "quiz" && (
         <Quiz
-          key={gameKey}   // ← forces full remount on each new game
+          key={gameKey}
           mode={mode}
           diff={diff}
+          lang={lang}
           onDone={handleDone}
         />
       )}
@@ -70,6 +99,7 @@ export default function App() {
       {screen === "results" && result && (
         <Results
           data={result}
+          lang={lang}
           onHome={() => setScreen("home")}
           onRetry={handleRetry}
         />
